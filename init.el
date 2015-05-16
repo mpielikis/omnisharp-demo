@@ -5,21 +5,23 @@
 (defvar mswindows-p (string-match "windows" (symbol-name system-type)))
 (defvar linux-p (string-match "linux" (symbol-name system-type)))
 
-(cua-mode 1)                   ; cut / copy / paste for noobs
-(setq inhibit-splash-screen t) ; disable splash screen
-(fset 'yes-or-no-p 'y-or-n-p)  ; stop asking me to type ‘yes’ as a confirmation
-(show-paren-mode t)
+(cua-mode 1)                      ; cut / copy / paste for noobs
+(setq inhibit-splash-screen t)    ; disable splash screen
+(fset 'yes-or-no-p 'y-or-n-p)     ; stop asking me to type ‘yes’ as a confirmation
+(show-paren-mode t)               ; see matching pairs of parentheses
+(savehist-mode t)                 ; save minibuffer history
+(setq ring-bell-function 'ignore) ; don't "ring the bell"
+
 
 ;; ---------
 ;; PACKAGING
 
 (require 'package)
-
 (setq package-archives
       '(("melpa"
          . "http://melpa.org/packages/")))
-
 (package-initialize)
+
 
 ;; ------------
 ;; GUI SETTINGS
@@ -29,8 +31,31 @@
 (set-scroll-bar-mode nil) ; disable scrollbar
 (load-theme 'monokai t)
 
-;;(set-face-attribute 'region nil 
-;;                    :background "#555")
+(set-face-attribute 'region nil 
+                    :background "#555")
+
+
+(global-hl-line-mode 1)   ; highlight current line
+(set-face-background 'hl-line "#333")
+
+;; Fonts
+
+;; (when mswindows-p
+;;   (set-face-attribute 'default nil
+;;                       :family "Consolas" :height 100))
+;; (when linux-p
+;;   (set-face-attribute 'default nil
+;;                       :family "Ubuntu Mono" :height 100))
+
+
+;; ------------------
+;; CODING SETTINGS
+
+;; Indentation
+(setq c-basic-offset 4)     ; indents 4 chars
+(setq tab-width 4)          ; and 4 char wide for TAB
+(setq indent-tabs-mode nil) ; and force use of spaces
+
 
 ;; ------------------
 ;; FUNC: Path helpers
@@ -105,8 +130,10 @@
 ;;                 (add-to-list 'new-load-path var)
 ;;                 (setq load-path (append new-load-path old-path))))))
 
-;; (require 'company)
+;; --------------
+;; COMPANY CONFIG
 
+;; (require 'company)
 
 ;; (setq company-begin-commands '(self-insert-command))
 ;; (setq omnisharp-company-do-template-completion t)
@@ -124,26 +151,22 @@
 ;;  '(company-show-numbers t)
 ;;  '(cua-mode t nil (cua-base))
 ;;  '(helm-ag-insert-at-point (quote word))
+
+;; -------------------------
+;; COMPANY CONFIG. OMNISHARP
+
 ;;  '(omnisharp-auto-complete-want-documentation nil)
 ;;  '(omnisharp-company-sort-results t)
 ;;  ;; '(omnisharp-server-executable-path
 ;;  ;;   (quote /Users/jason/\.vim/bundle/Omnisharp/server/OmniSharp/bin/Debug/OmniSharp\.exe))
+
+;; ;; rainbow mode coloring of #colors ???
 ;;  '(safe-local-variable-values
 ;;    (quote
 ;;     ((eval when
 ;;            (fboundp
 ;;             (quote rainbow-mode))
 ;;            (rainbow-mode 1)))))
-;;  '(savehist-mode t)
-;;  '(show-paren-mode t)
-;;  '(tool-bar-mode nil))
-
-;; (when mswindows-p
-;;   (set-face-attribute 'default nil
-;;                       :family "Consolas" :height 100))
-;; (when linux-p
-;;   (set-face-attribute 'default nil
-;;                       :family "Ubuntu Mono" :height 100))
 
 ;; (custom-set-faces
 ;;  ;; custom-set-faces was added by Custom.
@@ -151,13 +174,9 @@
 ;;  ;; Your init file should contain only one such instance.
 ;;  ;; If there is more than one, they won't work right.
 ;;  '(company-tooltip-annotation ((t (:inherit company-tooltip :foreground "yellow")))))
-;; (global-hl-line-mode 1)
- 
-;; ;; To customize the background color
-;; (set-face-background 'hl-line "#333")
-;; (setq ring-bell-function 'ignore)
 
-;; (show-paren-mode t)
+
+ 
 ;; (global-set-key (kbd "M-x") 'smex)
 
 ;; ;; esc quits
@@ -334,9 +353,6 @@
 ;; (projectile-global-mode)
 ;; (setq projectile-indexing-method 'alien)
 
-;; (setq c-basic-offset 4) ; indents 4 chars
-;; (setq tab-width 4)          ; and 4 char wide for TAB
-;; (setq indent-tabs-mode nil) ; And force use of spaces
 
 ;; (defun load-directory (directory)
 ;;   "Load recursively all `.el' files in DIRECTORY."
