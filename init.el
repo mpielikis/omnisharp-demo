@@ -1,4 +1,13 @@
 
+;; ---------
+;; PACKAGING
+
+(require 'package)
+(setq package-archives
+      '(("melpa"
+         . "http://melpa.org/packages/")))
+(package-initialize)
+
 ;; ---------------
 ;; COMMON SETTINGS
 
@@ -11,21 +20,45 @@
 (show-paren-mode t)                ; see matching pairs of parentheses
 (savehist-mode t)                  ; save minibuffer history
 (setq ring-bell-function 'ignore)  ; don't "ring the bell"
+(setq system-uses-terminfo nil)    ; use Emacs terminfo, not system terminfo
+
+;; show tabs and trailing whitespace
+(global-whitespace-mode)
+(setq whitespace-style '(trailing tabs tab-mark))
+
+;; disable auto-save and auto-backup
+(setq auto-save-default nil)
+(setq make-backup-files nil)
+(setq create-lockfiles nil)
+
+;; buffers
+(ido-mode t)
+(setq ido-enable-flex-matching t) ; any buffer name containing the entered characters in the given sequence will match.
+(setq ido-create-new-buffer 'always) ; do not ask permission to create a new buffer
+(autoload 'ibuffer "ibuffer" "List buffers." t)
+
+;; highlight parantheses that surrounds cursor
+(require 'highlight-parentheses)
+(define-globalized-minor-mode global-highlight-parentheses-mode
+  highlight-parentheses-mode
+  (lambda ()
+    (highlight-parentheses-mode t)))
+(global-highlight-parentheses-mode t)
 
 ;; ------------------
 ;; COMMON KEYBINDINGS
 
 (global-set-key (kbd "M-x") 'smex) ; set smex as default
 
-;; ---------
-;; PACKAGING
+;; window movement
+(global-set-key (kbd "M-<left>") 'windmove-left)
+(global-set-key (kbd "M-<right>") 'windmove-right)
+(global-set-key (kbd "M-<down>") 'windmove-down)
+(global-set-key (kbd "M-<up>") 'windmove-up)
 
-(require 'package)
-(setq package-archives
-      '(("melpa"
-         . "http://melpa.org/packages/")))
-(package-initialize)
-
+(global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
+(global-set-key (kbd "s-b") 'ido-switch-buffer)
+(global-set-key (kbd "C-x b") 'ibuffer)
 
 ;; ------------
 ;; GUI SETTINGS
@@ -44,22 +77,22 @@
 
 ;; Fonts
 
-;; (when mswindows-p
-;;   (set-face-attribute 'default nil
-;;                       :family "Consolas" :height 100))
-;; (when linux-p
-;;   (set-face-attribute 'default nil
-;;                       :family "Ubuntu Mono" :height 100))
-
+(when mswindows-p
+  (set-face-attribute 'default nil
+                      :family "Consolas" :height 100))
+(when linux-p
+  (set-face-attribute 'default nil
+                      :family "Ubuntu Mono" :height 100))
 
 ;; ------------------
 ;; CODING SETTINGS
 
 ;; Indentation
 
-(setq c-basic-offset 4)     ; indents 4 chars
-(setq tab-width 4)          ; and 4 char wide for TAB
-(setq indent-tabs-mode nil) ; and force use of spaces
+;; -- redefined --
+;; (setq c-basic-offset 4)     ; indents 4 chars
+;; (setq tab-width 4)          ; and 4 char wide for TAB
+;; (setq indent-tabs-mode nil) ; and force use of spaces
 
 
 ;; ------------------
@@ -109,7 +142,7 @@
 ;; FUNC: Common coding helpers
 
 ;; (defun comment-or-uncomment-region-or-line ()
-;;   "Comments or uncomments current current line or whole lines in region."
+;;   "Comments or uncomments current line or whole lines in region."
 ;;   (interactive)
 ;;   (save-excursion
 ;;     (let (min max)
@@ -182,7 +215,8 @@
 
 
  
-
+;; -------------------------
+;; Escape to Quit minibuffer
 
 ;; ;; esc quits
 ;; (defun minibuffer-keyboard-quit ()
@@ -202,10 +236,13 @@
 ;; (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 ;; (define-key company-mode-map [escape] 'company-abort)
 
-;; (fset 'yes-or-no-p 'y-or-n-p) ;;stop asking me to type ‘yes’ as a confirmation
 ;; (ido-mode t)
 ;; (setq ido-enable-flex-matching t)
 ;; (setq ido-create-new-buffer 'always)
+
+
+;; ----------------------
+;; Tab indent or complete
 
 ;; (defun check-expansion ()
 ;;   (save-excursion
@@ -230,6 +267,11 @@
 ;;           (indent-for-tab-command)))))
 
 ;; (define-key company-active-map (kbd "<tab>") 'tab-indent-or-complete)
+
+
+;; AAA
+;; ----
+
 ;; (setq yas-snippet-dirs
 ;;       '("~/.emacs.d/yasnippet-csharp"))
 
@@ -249,7 +291,8 @@
 ;; (require 'helm-misc)
 ;; (require 'omnisharp)
 ;; (setq compilation-ask-about-save nil)
-;; (global-set-key (kbd "s-o") 'ido-find-file)
+
+;; (global-set-key (kbd "s-o") 'ido-find-file) ;; C-x C-f
 
 ;; ;; find current buffer in directory
 ;; (global-set-key (kbd "C-M-l") 'neotree-find)
@@ -286,19 +329,38 @@
 ;;     (ad-enable-advice 'isearch-repeat 'after 'isearch-no-fail)
 ;;     (ad-activate 'isearch-repeat)))
 
+;; -----------------------
+;; coding: Key Chord
+
 ;; (require 'key-chord)
 ;; (key-chord-mode 1)
-
 ;; (setq key-chord-one-key-delay 0.2)
 ;; (setq key-chord-two-keys-delay 0.15)
+
+;; --------------------------
+;; Projectile
+
+(projectile-global-mode)
+
+;; indexing 
+(if mswindows-p
+  (setq projectile-indexing-method 'alien)
+  (setq projectile-indexing-method 'native))
+
+
 ;; (define-key global-map (kbd "C-,") 'helm-projectile)
 ;; (define-key company-active-map (kbd "C-j") 'company-select-next-or-abort)
 ;; (define-key company-active-map (kbd "C-k") 'company-select-previous-or-abort)
-;; ;; show tabs and trailing whitespace
-;; (global-whitespace-mode)
-;; (setq whitespace-style '(trailing tabs tab-mark))
+
+
+;; -------------------
+;; keys: ace
 
 ;; (define-key global-map (kbd "s-j") 'ace-jump-mode)
+
+
+;; -------------------
+;; HELPERS: Are not used
 
 ;; (defun company-complete-selection-insert-key(company-key)
 ;;   (company-complete-selection)
@@ -316,74 +378,65 @@
 ;; ;; better than vim-vinegar
 ;; (require 'dired)
 
+;; -----------------
+;; ElScreen
+
 ;; (global-set-key [M-left] 'elscreen-previous)
 ;; (global-set-key [M-right] 'elscreen-next)
+
+
 ;; ;; This is your old M-x.
-;; (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+;; ;; (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 
-;; (fset 'yes-or-no-p 'y-or-n-p) ;;stop asking me to type ‘yes’ as a confirmation
-;; (show-paren-mode t)
-;; ;;Ido mode for file completion:
-;; (ido-mode t)
-;; (setq ido-enable-flex-matching t)
-;; (setq ido-create-new-buffer 'always)
-;; ;;ido for better buffer management:
-;; (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
-;; (global-set-key (kbd "s-b") 'ido-switch-buffer)
-;; ;;window movement
-;; (global-set-key (kbd "M-<left>") 'windmove-left)
-;; (global-set-key (kbd "M-<right>") 'windmove-right)
-;; (global-set-key (kbd "M-<down>") 'windmove-down)
-
-;; (global-set-key (kbd "M-<up>") 'windmove-up)
-;; (autoload 'ibuffer "ibuffer" "List buffers." t)
 
 ;; ;; (setq backup-directory-alist
 ;; ;;           `((".*" . ,temporary-file-directory)))
 ;; ;; (setq auto-save-file-name-transforms
 ;; ;;           `((".*" ,temporary-file-directory t)))
-;; ;; disable auto-save and auto-backup
-;; (setq auto-save-default nil)
-;; (setq make-backup-files nil)
-;; (setq create-lockfiles nil)
 
-;; (require 'highlight-parentheses)
-;; (define-globalized-minor-mode global-highlight-parentheses-mode
-;;   highlight-parentheses-mode
-;;   (lambda ()
-;;     (highlight-parentheses-mode t)))
-;; (global-highlight-parentheses-mode t)
+
+
 ;; (setq ring-bell-function 'ignore)
 
-;; (projectile-global-mode)
-;; (setq projectile-indexing-method 'alien)
+
+;; ----------------------
+;; AnsiTerm improving: http://echosa.github.io/blog/2012/06/06/improving-ansi-term/
+
+(defun my-term-use-utf8 ()
+  (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
+
+(defun my-term-paste (&optional string)
+  (interactive)
+  (process-send-string
+   (get-buffer-process (current-buffer))
+   (if string string (current-kill 0))))
+
+(defun my-term-hook ()
+  (goto-address-mode)
+  (define-key term-raw-map "\C-y" 'my-term-paste))
+
+(add-hook 'term-exec-hook 'my-term-use-utf8)
+(add-hook 'term-mode-hook 'my-term-hook)
+
+;; ----------------
+;; EVIL
+
+;; (add-hook 'term-mode-hook 'evil-emacs-state)
 
 
-;; (defun load-directory (directory)
-;;   "Load recursively all `.el' files in DIRECTORY."
-;;   (dolist (element (directory-files-and-attributes directory nil nil nil))
-;;     (let* ((path (car element))
-;;            (fullpath (concat directory "/" path))
-;;            (isdir (car (cdr element)))
-;;            (ignore-dir (or (string= path ".") (string= path ".."))))
-;;       (cond
-;;        ((and (eq isdir t) (not ignore-dir))
-;;         (load-directory fullpath))
-;;        ((and (eq isdir nil) (string= (substring path -3) ".el"))
-;;         (load (file-name-sans-extension fullpath)))))))
-;; (load-directory "~/.emacs.d/config")
+;; ------------------
+;; LOAD CONFIGS
 
-;; ;; (add-hook 'term-mode-hook 'evil-emacs-state)
-
-;; (defun my-term-use-utf8 ()
-;;   (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))
-
-;; (add-hook 'term-exec-hook 'my-term-use-utf8)
-
-;; (defun my-term-hook ()
-;;   (goto-address-mode)
-;;   (define-key term-raw-map "\C-y" 'my-term-paste))
-
-;; (add-hook 'term-mode-hook 'my-term-hook)
-
-;; (setq system-uses-terminfo nil)
+(defun load-directory (directory)
+  "Load recursively all `.el' files in DIRECTORY."
+  (dolist (element (directory-files-and-attributes directory nil nil nil))
+    (let* ((path (car element))
+           (fullpath (concat directory "/" path))
+           (isdir (car (cdr element)))
+           (ignore-dir (or (string= path ".") (string= path ".."))))
+      (cond
+       ((and (eq isdir t) (not ignore-dir))
+        (load-directory fullpath))
+       ((and (eq isdir nil) (string= (substring path -3) ".el"))
+        (load (file-name-sans-extension fullpath)))))))
+(load-directory "~/.emacs.d/config")
