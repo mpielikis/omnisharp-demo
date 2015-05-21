@@ -5,13 +5,17 @@
 (defvar mswindows-p (string-match "windows" (symbol-name system-type)))
 (defvar linux-p (string-match "linux" (symbol-name system-type)))
 
-(cua-mode 1)                      ; cut / copy / paste for noobs
-(setq inhibit-splash-screen t)    ; disable splash screen
-(fset 'yes-or-no-p 'y-or-n-p)     ; stop asking me to type ‘yes’ as a confirmation
-(show-paren-mode t)               ; see matching pairs of parentheses
-(savehist-mode t)                 ; save minibuffer history
-(setq ring-bell-function 'ignore) ; don't "ring the bell"
+(cua-mode 1)                       ; cut / copy / paste for noobs
+(setq inhibit-splash-screen t)     ; disable splash screen
+(fset 'yes-or-no-p 'y-or-n-p)      ; stop asking me to type ‘yes’ as a confirmation
+(show-paren-mode t)                ; see matching pairs of parentheses
+(savehist-mode t)                  ; save minibuffer history
+(setq ring-bell-function 'ignore)  ; don't "ring the bell"
 
+;; ------------------
+;; COMMON KEYBINDINGS
+
+(global-set-key (kbd "M-x") 'smex) ; set smex as default
 
 ;; ---------
 ;; PACKAGING
@@ -29,14 +33,14 @@
 (tool-bar-mode -1)        ; disable toolbar
 (menu-bar-mode -1)        ; disable menu
 (set-scroll-bar-mode nil) ; disable scrollbar
+(global-hl-line-mode 1)   ; highlight current line
+
+;; Colors
+
 (load-theme 'monokai t)
 
-(set-face-attribute 'region nil 
-                    :background "#555")
-
-
-(global-hl-line-mode 1)   ; highlight current line
 (set-face-background 'hl-line "#333")
+(set-face-background 'region "#555")
 
 ;; Fonts
 
@@ -52,6 +56,7 @@
 ;; CODING SETTINGS
 
 ;; Indentation
+
 (setq c-basic-offset 4)     ; indents 4 chars
 (setq tab-width 4)          ; and 4 char wide for TAB
 (setq indent-tabs-mode nil) ; and force use of spaces
@@ -177,7 +182,7 @@
 
 
  
-;; (global-set-key (kbd "M-x") 'smex)
+
 
 ;; ;; esc quits
 ;; (defun minibuffer-keyboard-quit ()
