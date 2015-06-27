@@ -11,6 +11,10 @@
 ;; ---------------
 ;; COMMON SETTINGS
 
+;; Windows super key on <apps>
+(setq w32-pass-apps-to-system nil)
+(setq w32-apps-modifier 'super) ; Menu/App key
+
 (defvar mswindows-p (string-match "windows" (symbol-name system-type)))
 (defvar linux-p (string-match "linux" (symbol-name system-type)))
 
@@ -32,9 +36,10 @@
 (setq create-lockfiles nil)
 
 ;; buffers
-(ido-mode t)
-(setq ido-enable-flex-matching t) ; any buffer name containing the entered characters in the given sequence will match.
-(setq ido-create-new-buffer 'always) ; do not ask permission to create a new buffer
+;; (ido-mode t)
+;; (setq ido-enable-flex-matching t) ; any buffer name containing the entered characters in the given sequence will match.
+;; (setq ido-create-new-buffer 'always) ; do not ask permission to create a new buffer
+
 (autoload 'ibuffer "ibuffer" "List buffers." t)
 
 ;; highlight parantheses that surrounds cursor
@@ -45,10 +50,21 @@
     (highlight-parentheses-mode t)))
 (global-highlight-parentheses-mode t)
 
+
+
+
+
+;; GENERAL
+;; -------
+
+(setq-default cursor-type 'bar)
+(setq gc-cons-threshold 20000000) ; faster emacs
+
+
 ;; ------------------
 ;; COMMON KEYBINDINGS
 
-(global-set-key (kbd "M-x") 'smex) ; set smex as default
+(global-set-key (kbd "M-x") 'helm-M-x) ; set smex as default
 
 ;; window movement
 (global-set-key (kbd "M-<left>") 'windmove-left)
@@ -56,9 +72,10 @@
 (global-set-key (kbd "M-<down>") 'windmove-down)
 (global-set-key (kbd "M-<up>") 'windmove-up)
 
-(global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
+(global-set-key (kbd "C-x C-b") 'helm-buffers-list)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
 (global-set-key (kbd "s-b") 'ido-switch-buffer)
-(global-set-key (kbd "C-x b") 'ibuffer)
+(global-set-key (kbd "C-x b") 'helm-mini)
 
 ;; ------------
 ;; GUI SETTINGS
@@ -139,7 +156,6 @@
 ;; (eval-after-load 'csharp-mode
 ;;   '(progn
 ;;      (define-key csharp-mode-map (kbd "SPC") 'csharp-should-method-space-replace)))
-
 ;; ---------------------------
 ;; FUNC: Common coding helpers
 
@@ -171,34 +187,36 @@
 ;;                 (setq load-path (append new-load-path old-path))))))
 
 ;; --------------
-;; COMPANY CONFIG
+;; COMPANY CONFIG - text completion
 
-;; (require 'company)
+(require 'company)
 
-;; (setq company-begin-commands '(self-insert-command))
-;; (setq omnisharp-company-do-template-completion t)
-;; (custom-set-variables
-;;  ;; custom-set-variables was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;;  '(company-frontends
-;;    (quote
-;;     (company-pseudo-tooltip-frontend company-echo-metadata-frontend)))
-;;  '(company-idle-delay 0.03)
-;;  '(company-minimum-prefix-length 1)
-;;  '(company-require-match nil)
-;;  '(company-show-numbers t)
-;;  '(cua-mode t nil (cua-base))
-;;  '(helm-ag-insert-at-point (quote word))
+(setq company-begin-commands '(self-insert-command))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(company-frontends
+   (quote
+    (company-pseudo-tooltip-frontend company-echo-metadata-frontend)))
+ '(company-idle-delay 0.03)
+ '(company-minimum-prefix-length 1)
+ '(company-require-match nil)
+ '(company-show-numbers t)
+ '(cua-mode t nil (cua-base))
+  '(helm-ag-insert-at-point (quote word)))
+
 
 ;; -------------------------
 ;; COMPANY CONFIG. OMNISHARP
 
-;;  '(omnisharp-auto-complete-want-documentation nil)
-;;  '(omnisharp-company-sort-results t)
-;;  ;; '(omnisharp-server-executable-path
-;;  ;;   (quote /Users/jason/\.vim/bundle/Omnisharp/server/OmniSharp/bin/Debug/OmniSharp\.exe))
+(setq omnisharp-company-do-template-completion t)
+
+ ;; '(omnisharp-auto-complete-want-documentation nil)
+ ;; '(omnisharp-company-sort-results t)
+ ;; '(omnisharp-server-executable-path
+ ;;   (quote /Users/jason/\.vim/bundle/Omnisharp/server/OmniSharp/bin/Debug/OmniSharp\.exe))
 
 ;; ;; rainbow mode coloring of #colors ???
 ;;  '(safe-local-variable-values
@@ -243,39 +261,42 @@
 ;; (setq ido-create-new-buffer 'always)
 
 
-;; ----------------------
+
+;; ---------
+;; yasnippet
+(require 'yasnippet)
+
+(setq yas-snippet-dirs
+      '("~/.emacs.d/yasnippet-csharp"))
+
+(yas-reload-all)
+
 ;; Tab indent or complete
 
-;; (defun check-expansion ()
-;;   (save-excursion
-;;     (if (looking-at "\\_>") t
-;;       (backward-char 1)
-;;       (if (looking-at "\\.") t
-;;         (backward-char 1)
-;;         (if (looking-at "->") t nil)))))
+(defun check-expansion ()
+  (save-excursion
+    (if (looking-at "\\_>") t
+      (backward-char 1)
+      (if (looking-at "\\.") t
+        (backward-char 1)
+        (if (looking-at "->") t nil)))))
 
-;; (defun do-yas-expand ()
-;;   (let ((yas/fallback-behavior 'return-nil))
-;;     (yas/expand)))
+(defun do-yas-expand ()
+  (let ((yas/fallback-behavior 'return-nil))
+    (yas/expand)))
 
-;; (defun tab-indent-or-complete ()
-;;   (interactive)
-;;   (if (minibufferp)
-;;       (minibuffer-complete)
-;;     (if (or (not yas/minor-mode)
-;;             (null (do-yas-expand)))
-;;         (if (check-expansion)
-;;             (company-complete-common)
-;;           (indent-for-tab-command)))))
+(defun tab-indent-or-complete ()
+  (interactive)
+  (if (minibufferp)
+      (minibuffer-complete)
+    (if (or (not yas/minor-mode)
+            (null (do-yas-expand)))
+        (if (check-expansion)
+            (company-complete-common)
+          (indent-for-tab-command)))))
 
-;; (define-key company-active-map (kbd "<tab>") 'tab-indent-or-complete)
+(define-key company-active-map (kbd "<tab>") 'tab-indent-or-complete)
 
-
-;; AAA
-;; ----
-
-;; (setq yas-snippet-dirs
-;;       '("~/.emacs.d/yasnippet-csharp"))
 
 ;; (defun dos2unix (buffer)
 ;;   "Automate M-% C-q C-m RET C-q C-j RET"
@@ -287,18 +308,22 @@
 ;;   nil
 ;;   )
 
-;; (require 'helm-config)
-;; (require 'helm-command)
-;; (require 'helm-elisp)
-;; (require 'helm-misc)
-;; (require 'omnisharp)
-;; (setq compilation-ask-about-save nil)
+(require 'helm-config)
+(require 'helm-command)
+(require 'helm-elisp)
+(require 'helm-misc)
+(require 'omnisharp)
+
+(helm-mode t)
+(helm-adaptative-mode t)
+
+(setq compilation-ask-about-save nil)
 
 ;; (global-set-key (kbd "s-o") 'ido-find-file) ;; C-x C-f
 
-;; ;; find current buffer in directory
-;; (global-set-key (kbd "C-M-l") 'neotree-find)
-;; (global-set-key (kbd "<f7>") 'neotree-toggle)
+;; find current buffer in directory
+(global-set-key (kbd "C-M-l") 'neotree-find)
+(global-set-key (kbd "<f7>") 'neotree-toggle)
 ;; (global-set-key (kbd "C-+") 'text-scale-increase)
 ;; (global-set-key (kbd "C-=") 'text-scale-increase)
 ;; (global-set-key (kbd "C--") 'text-scale-decrease)
@@ -350,15 +375,13 @@
   (setq projectile-indexing-method 'native))
 
 
-;; (define-key global-map (kbd "C-,") 'helm-projectile)
-;; (define-key company-active-map (kbd "C-j") 'company-select-next-or-abort)
-;; (define-key company-active-map (kbd "C-k") 'company-select-previous-or-abort)
+(define-key global-map (kbd "C-,") 'helm-projectile)
 
 
 ;; -------------------
 ;; keys: ace
 
-;; (define-key global-map (kbd "s-j") 'ace-jump-mode)
+(define-key global-map (kbd "s-a") 'ace-jump-mode)
 
 
 ;; -------------------
